@@ -1,18 +1,22 @@
-# Workana Tracker 📊
+# Job Tracker Pro 📊
 
-Aplicación web para rastrear y mostrar los últimos trabajos de programación publicados en Workana, ordenados por fecha de publicación.
+Aplicación web para rastrear y mostrar los últimos trabajos de programación publicados en **Workana** y **Freelancer.com**, ordenados por fecha de publicación.
 
 ## 🚀 Características
 
-- ✅ **Scraping automático** de trabajos desde Workana
+- ✅ **Scraping automático** desde Workana y Freelancer
+- 🎯 **Múltiples fuentes** con tabs para cambiar entre plataformas
 - 📅 **Ordenamiento por fecha** de publicación
 - 🔍 **Filtros avanzados** por título, país y skills
 - 🔄 **Auto-refresh** cada 2 minutos (configurable)
 - ⚡ **Caché inteligente** de 60 segundos para optimizar rendimiento
 - 🌓 **Tema claro/oscuro** persistente
 - 🎉 **Contador de nuevos trabajos** desde la última visita
+- 🔔 **Notificaciones sonoras** cuando hay nuevos trabajos
 - 📱 **Diseño responsive** para móviles y tablets
 - 📲 **Notificaciones por Telegram** (opcional)
+- 🔥 **Página /latest** con trabajos de las últimas 24 horas
+- 🏷️ **Etiquetas de fuente** (Workana violeta, Freelancer celeste)
 
 ## 📋 Requisitos Previos
 
@@ -71,26 +75,48 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 workana-tracker/
 ├── app/
 │   ├── api/
+│   │   ├── all/
+│   │   │   └── route.js          # API endpoint unificado
+│   │   ├── freelancer/
+│   │   │   └── route.js          # API endpoint Freelancer
 │   │   └── jobs/
-│   │       └── route.js          # API endpoint para scraping
+│   │       └── route.js          # API endpoint Workana
+│   ├── latest/
+│   │   └── page.jsx              # Página últimas 24 horas
 │   ├── globals.css               # Estilos globales
 │   ├── layout.jsx                # Layout raíz
-│   └── page.jsx                  # Página principal
+│   └── page.jsx                  # Página principal con tabs
 ├── components/
 │   ├── FilterPanel.jsx           # Panel de filtros
-│   └── JobCard.jsx               # Tarjeta de trabajo individual
+│   ├── JobCard.jsx               # Tarjeta de trabajo individual
+│   └── TabSelector.jsx           # Selector de pestañas
 ├── lib/
 │   ├── cache.js                  # Sistema de caché en memoria
-│   ├── scraper.js                # Lógica de scraping
+│   ├── scraper.js                # Scraping de Workana
+│   ├── freelancerScraper.js      # Scraping de Freelancer
 │   └── telegram.js               # Notificaciones Telegram
 ├── .env.example                  # Ejemplo de variables de entorno
 ├── .gitignore
 ├── next.config.js                # Configuración de Next.js
 ├── package.json
+├── vercel.json                   # Configuración para Vercel
+├── DEPLOYMENT.md                 # Guía de deployment
+├── GITHUB-GUIDE.md               # Guía para subir a GitHub
 └── README.md
 ```
 
 ## 🎯 Uso
+
+### Cambiar entre Fuentes
+
+Usa las pestañas en la parte superior para cambiar entre:
+- **💼 Workana**: Solo trabajos de Workana
+- **💻 Freelancer**: Solo proyectos de Freelancer
+- **🌐 Todos**: Trabajos de ambas plataformas combinados
+
+### Página /latest
+
+Visita `/latest` para ver todos los trabajos publicados en las últimas 24 horas de ambas plataformas.
 
 ### Filtrar Trabajos
 
@@ -98,13 +124,17 @@ workana-tracker/
 2. **Por país**: Filtra por ubicación del cliente
 3. **Por skills**: Busca trabajos que requieran tecnologías específicas
 
+### Notificaciones Sonoras
+
+Haz clic en el botón 🔔/🔕 para activar/desactivar las notificaciones sonoras cuando aparezcan nuevos trabajos.
+
 ### Refrescar Manualmente
 
 Haz clic en el botón "🔄 Refrescar" para obtener los trabajos más recientes inmediatamente.
 
 ### Cambiar Tema
 
-Haz clic en el botón 🌙/☀️ en la esquina superior derecha para alternar entre tema claro y oscuro.
+Haz clic en el botón 🌙/☀️ para alternar entre tema claro y oscuro.
 
 ## 🚀 Deployment en Vercel
 
@@ -159,7 +189,15 @@ vercel --prod
 
 ### GET /api/jobs
 
-Obtiene la lista de trabajos (usa caché si está disponible).
+Obtiene trabajos de Workana (usa caché si está disponible).
+
+### GET /api/freelancer
+
+Obtiene proyectos de Freelancer (usa caché si está disponible).
+
+### GET /api/all?hours=24
+
+Obtiene trabajos combinados de ambas fuentes, filtrados por tiempo.
 
 **Response:**
 ```json
@@ -168,13 +206,18 @@ Obtiene la lista de trabajos (usa caché si está disponible).
   "jobs": [...],
   "cached": false,
   "count": 50,
+  "sources": ["Workana", "Freelancer"],
+  "breakdown": {
+    "workana": 30,
+    "freelancer": 20
+  },
   "timestamp": "2025-12-02T10:00:00.000Z"
 }
 ```
 
-### POST /api/jobs
+### POST /api/jobs | /api/freelancer | /api/all
 
-Fuerza una actualización del caché y hace nuevo scraping.
+Fuerza una actualización del caché (limpiar caché y hacer nuevo scraping).
 
 ## 🔔 Configurar Notificaciones de Telegram
 

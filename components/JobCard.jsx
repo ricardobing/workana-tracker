@@ -1,11 +1,16 @@
 /**
  * Componente JobCard
- * Muestra la información de un trabajo individual de Workana
+ * Muestra la información de un trabajo individual de cualquier fuente
  */
 
 'use client';
 
 export default function JobCard({ job }) {
+  // Colores por fuente
+  const sourceColors = {
+    'Workana': '#8B5CF6',
+    'Freelancer': '#3B82F6',
+  };
   /**
    * Calcula el tiempo transcurrido desde la publicación
    */
@@ -30,6 +35,13 @@ export default function JobCard({ job }) {
 
   return (
     <div className="job-card">
+      {/* Badge de fuente */}
+      {job.source && (
+        <div className="job-source-badge" style={{ backgroundColor: sourceColors[job.source] || '#6B7280' }}>
+          {job.source}
+        </div>
+      )}
+
       {/* Título con enlace */}
       <div className="job-header">
         <h3 className="job-title">
@@ -58,9 +70,16 @@ export default function JobCard({ job }) {
       </div>
 
       {/* Presupuesto */}
-      {job.budget && job.budget !== 'No especificado' && (
+      {(job.budget || job.price) && (job.budget !== 'No especificado' || job.price !== 'No especificado') && (
         <div className="job-budget">
-          💰 {job.budget}
+          💰 {job.budget || job.price}
+        </div>
+      )}
+
+      {/* Tipo de proyecto (para Freelancer) */}
+      {job.type && job.type !== 'No especificado' && (
+        <div className="job-type">
+          📋 {job.type}
         </div>
       )}
 

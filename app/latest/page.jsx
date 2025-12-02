@@ -1,29 +1,24 @@
 /**
- * Página Principal - Workana Tracker
- * Muestra trabajos de Workana con filtros y auto-refresh
+ * Página /latest - Trabajos de las últimas 24 horas
+ * Muestra todos los trabajos de Workana y Freelancer publicados recientemente
  */
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import JobCard from '@/components/JobCard';
 import FilterPanel from '@/components/FilterPanel';
-import TabSelector from '@/components/TabSelector';
 
-// Intervalo de auto-refresh (2 minutos = 120 segundos)
-const REFRESH_INTERVAL = parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL || '120') * 1000;
-
-export default function Home() {
+export default function LatestPage() {
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
-  const [newJobsCount, setNewJobsCount] = useState(0);
   const [theme, setTheme] = useState('light');
-  const [activeTab, setActiveTab] = useState('all'); // Pestaña activa: workana, freelancer, all
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  
+  const [breakdown, setBreakdown] = useState({ workana: 0, freelancer: 0 });
+
   // Estado de filtros
   const [filters, setFilters] = useState({
     title: '',
@@ -32,21 +27,14 @@ export default function Home() {
   });
 
   /**
-   * Obtener trabajos de la API según la pestaña activa
+   * Obtener trabajos de las últimas 24 horas
    */
-  const fetchJobs = useCallback(async (forceRefresh = false, tab = activeTab) => {
+  const fetchLatestJobs = async (forceRefresh = false) => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Determinar URL según la pestaña
-      const urls = {
-        workana: '/api/jobs',
-        freelancer: '/api/freelancer',
-        all: '/api/all',
-      };
-      const url = urls[tab] || urls.all;
-
+      const url = '/api/all?hours=24';
       const options = forceRefresh 
         ? { method: 'POST' }
         : { method: 'GET' };
@@ -55,73 +43,36 @@ export default function Home() {
       const data = await response.json();
 
       if (data.success) {
-        // Detectar nuevos trabajos
-        if (jobs.length > 0 && data.jobs.length > jobs.length) {
-          const newCount = data.jobs.length - jobs.length;
-          setNewJobsCount(newCount);
-          
-          // Reproducir sonido si está habilitado
-          if (soundEnabled) {
-            playNotificationSound();
-          }
-          
-          // Limpiar contador después de 5 segundos
-          setTimeout(() => setNewJobsCount(0), 5000);
-        }
-
         setJobs(data.jobs);
         setLastUpdate(new Date());
+        if (data.breakdown) {
+          setBreakdown(data.breakdown);
+        }
       } else {
         setError(data.error || 'Error al obtener trabajos');
       }
     } catch (err) {
-      console.error('Error fetching jobs:', err);
+      console.error('Error fetching latest jobs:', err);
       setError('Error de conexión. Por favor, intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
-  }, [jobs.length, activeTab, soundEnabled]);
-
-  /**
-   * Reproducir sonido de notificación
-   */
-  const playNotificationSound = () => {
-    try {
-      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSqA0fPTgjMGHm7A7+OZRA0PWqvn76RaFg1OouHyv2AkBSl+0PPaiDcHHGrB7uSaQg4RYrTp7KdTEwtPn+HyvGMhBSqA0PPTgjQGHm/A7+OZRA0QWqzn8KRaFg5OouHyv2AkBSh+0PPaiDcHHGrB7uSaQg4RYrTp7KdTEwtPn+HyvGMhBSh90PPTgjQGHm/A7+OZRA0QWqzn8KRaFg5OouHyv2AkBSh+0PPaiDcHHGrB7uSaQg4RYrTp7KdTEwtPn+HyvGMhBSh90PPTgjQGHm/A7+OZRA0QWqzn8KRaFg5OouHyv2AkBSh+0PPaiDcHHGrB7uSaQg4RYrTp7KdTEwtPn+HyvGMhBSh90PPTgjQGHm/A7+OZRA0QWqzn8KRaFg5OouHyv2AkBSh+0PPaiDcHHGrB7uSaQg4RYrTp7KdTEwtPn+HyvGMhBSh90PPTgjQGHm/A7+OZRA0QWqzn8KRaFg5OouHyv2AkBSh+0PPaiDcHHGrB7uSaQg4RYrTp7KdTEwtPn+HyvGMhBSh90PPTgjQGHm/A7+OZRA0QWqzn8KRaFg5OouHyv2AkBSh+0PPaiDcHHGrB7uSaQg4RYrTp7KdTEwtPn+HyvGMhBSh90PPTgjQGHm/A7+OZRA0QWqzn8KRaFg5OouHyv2AkBSh+0PPaiDcHHGrB7uSaQg4RYrTp7KdTEwtPn+HyvGMhBSh90PPTgjQGHm/A7+OZRA0QWqzn8KRaFg5OouHyv2AkBSh+0PPaiDcHHGrB7uSaQg4RYrTp7KdTEw==');
-      audio.volume = 0.3;
-      audio.play().catch(e => console.log('Error al reproducir sonido:', e));
-    } catch (error) {
-      console.error('Error al crear audio:', error);
-    }
   };
 
   /**
-   * Manejar cambio de pestaña
-   */
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    setJobs([]); // Limpiar trabajos actuales
-    fetchJobs(false, tab);
-  };
-
-  /**
-   * Cargar trabajos al montar el componente o cambiar de pestaña
+   * Cargar trabajos al montar el componente
    */
   useEffect(() => {
-    fetchJobs(false, activeTab);
-  }, []);
+    fetchLatestJobs();
 
-  /**
-   * Auto-refresh cada 2 minutos
-   */
-  useEffect(() => {
+    // Auto-refresh cada 2 minutos
     const interval = setInterval(() => {
       console.log('[AUTO-REFRESH] Actualizando trabajos...');
-      fetchJobs();
-    }, REFRESH_INTERVAL);
+      fetchLatestJobs();
+    }, 120000);
 
     return () => clearInterval(interval);
-  }, [fetchJobs]);
+  }, []);
 
   /**
    * Aplicar filtros cuando cambian los trabajos o filtros
@@ -169,7 +120,7 @@ export default function Home() {
    * Manejar refresh manual
    */
   const handleRefresh = () => {
-    fetchJobs(true);
+    fetchLatestJobs(true);
   };
 
   /**
@@ -179,6 +130,7 @@ export default function Home() {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
   };
 
   /**
@@ -190,30 +142,18 @@ export default function Home() {
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
 
-  /**
-   * Guardar tema
-   */
-  useEffect(() => {
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
   return (
     <div className="container">
       {/* Header */}
       <header className="header">
         <div className="header-content">
           <h1 className="title">
-            📊 Job Tracker Pro
+            🔥 Últimas 24 Horas
           </h1>
           <div className="header-actions">
-            <button 
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`sound-toggle ${soundEnabled ? 'active' : ''}`}
-              aria-label="Toggle sound"
-              title={soundEnabled ? 'Sonido activado' : 'Sonido desactivado'}
-            >
-              {soundEnabled ? '🔔' : '🔕'}
-            </button>
+            <Link href="/" className="back-button">
+              ← Volver
+            </Link>
             <button 
               onClick={toggleTheme} 
               className="theme-toggle"
@@ -224,7 +164,7 @@ export default function Home() {
           </div>
         </div>
         <p className="subtitle">
-          Trabajos de Workana y Freelancer ordenados por fecha
+          Todos los trabajos publicados en las últimas 24 horas
         </p>
         
         {/* Información de actualización */}
@@ -232,21 +172,23 @@ export default function Home() {
           <div className="update-info">
             Última actualización: {lastUpdate.toLocaleTimeString('es-ES')}
             <span className="auto-refresh-note">
-              • Auto-refresh cada {REFRESH_INTERVAL / 1000} segundos
+              • Auto-refresh cada 120 segundos
             </span>
           </div>
         )}
 
-        {/* Contador de nuevos trabajos */}
-        {newJobsCount > 0 && (
-          <div className="new-jobs-alert">
-            🎉 ¡{newJobsCount} nuevo{newJobsCount > 1 ? 's' : ''} trabajo{newJobsCount > 1 ? 's' : ''} disponible{newJobsCount > 1 ? 's' : ''}!
+        {/* Desglose por fuente */}
+        {(breakdown.workana > 0 || breakdown.freelancer > 0) && (
+          <div className="source-breakdown">
+            <span className="breakdown-item workana">
+              💼 Workana: {breakdown.workana}
+            </span>
+            <span className="breakdown-item freelancer">
+              💻 Freelancer: {breakdown.freelancer}
+            </span>
           </div>
         )}
       </header>
-
-      {/* Selector de pestañas */}
-      <TabSelector activeTab={activeTab} onTabChange={handleTabChange} />
 
       {/* Panel de filtros */}
       <FilterPanel
@@ -258,7 +200,7 @@ export default function Home() {
 
       {/* Contador de resultados */}
       <div className="results-count">
-        {filteredJobs.length} trabajo{filteredJobs.length !== 1 ? 's' : ''} encontrado{filteredJobs.length !== 1 ? 's' : ''}
+        {filteredJobs.length} trabajo{filteredJobs.length !== 1 ? 's' : ''} en las últimas 24 horas
         {filters.title || filters.country || filters.skills ? ` (de ${jobs.length} totales)` : ''}
       </div>
 
@@ -266,7 +208,7 @@ export default function Home() {
       {isLoading && jobs.length === 0 && (
         <div className="loading">
           <div className="spinner"></div>
-          <p>Cargando trabajos de Workana...</p>
+          <p>Cargando trabajos recientes...</p>
         </div>
       )}
 
@@ -286,7 +228,7 @@ export default function Home() {
 
       {!isLoading && jobs.length === 0 && !error && (
         <div className="no-results">
-          No hay trabajos disponibles en este momento.
+          No hay trabajos publicados en las últimas 24 horas.
         </div>
       )}
 
@@ -301,15 +243,23 @@ export default function Home() {
         <p>
           Datos obtenidos de{' '}
           <a 
-            href="https://www.workana.com/jobs?category=it-programming&language=es&publication=1d"
+            href="https://www.workana.com"
             target="_blank"
             rel="noopener noreferrer"
           >
             Workana
           </a>
+          {' '}y{' '}
+          <a 
+            href="https://www.freelancer.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Freelancer
+          </a>
         </p>
         <p className="footer-note">
-          🔄 Los datos se actualizan automáticamente cada {REFRESH_INTERVAL / 1000} segundos
+          🔄 Los datos se actualizan automáticamente cada 120 segundos
         </p>
       </footer>
     </div>

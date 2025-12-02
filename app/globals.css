@@ -142,6 +142,115 @@ body {
 .header-actions {
   display: flex;
   gap: 10px;
+  align-items: center;
+}
+
+.back-button {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 16px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  border-color: var(--accent-primary);
+  transform: translateX(-3px);
+}
+
+.sound-toggle {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.6;
+}
+
+.sound-toggle.active {
+  opacity: 1;
+  border-color: var(--success);
+}
+
+.sound-toggle:hover {
+  transform: scale(1.1);
+  border-color: var(--accent-primary);
+}
+
+.source-breakdown {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.breakdown-item {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.breakdown-item.workana {
+  background-color: rgba(139, 92, 246, 0.2);
+  color: #8B5CF6;
+}
+
+.breakdown-item.freelancer {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #3B82F6;
+}
+
+/* ========== Tab Selector ========== */
+.tab-selector {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.tab-button.active {
+  background-color: var(--tab-color);
+  color: white;
+  border-color: var(--tab-color);
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--bg-primary);
 }
 
 /* ========== Filter Panel ========== */
@@ -274,6 +383,20 @@ body {
   padding: 20px;
   box-shadow: var(--shadow);
   transition: all 0.3s ease;
+  position: relative;
+}
+
+.job-source-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .job-card:hover {
@@ -339,6 +462,17 @@ body {
   color: var(--success);
   margin-bottom: 12px;
   display: inline-block;
+}
+
+.job-type {
+  background-color: var(--bg-secondary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: var(--accent-primary);
+  margin-bottom: 12px;
+  display: inline-block;
+  margin-left: 10px;
 }
 
 .job-skills {

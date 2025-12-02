@@ -1,25 +1,23 @@
 /**
- * API Route: /api/jobs
- * Endpoint para obtener trabajos de Workana con scraping y caché
+ * API Route: /api/freelancer
+ * Endpoint para obtener proyectos de Freelancer.com con scraping y caché
  */
 
 import { NextResponse } from 'next/server';
-import { scrapeWorkanaJobs } from '@/lib/scraper';
+import { scrapeFreelancerJobs } from '@/lib/freelancerScraper';
 import cache from '@/lib/cache';
-import { notifyNewJobs, isTelegramConfigured } from '@/lib/telegram';
 
 // Configuración del cache (60 segundos por defecto)
 const CACHE_DURATION = parseInt(process.env.CACHE_DURATION || '60') * 1000;
-const CACHE_KEY = 'workana-jobs';
-const LAST_COUNT_KEY = 'workana-last-count';
+const CACHE_KEY = 'freelancer-jobs';
 
 /**
- * GET /api/jobs
- * Obtiene los trabajos de Workana, usando caché si está disponible
+ * GET /api/freelancer
+ * Obtiene los proyectos de Freelancer, usando caché si está disponible
  */
 export async function GET(request) {
   try {
-    console.log('[API] Petición recibida en /api/jobs');
+    console.log('[API] Petición recibida en /api/freelancer');
 
     // Intentar obtener del caché primero
     const cachedJobs = cache.get(CACHE_KEY);
@@ -31,23 +29,14 @@ export async function GET(request) {
         jobs: cachedJobs,
         cached: true,
         count: cachedJobs.length,
+        source: 'Freelancer',
         timestamp: new Date().toISOString(),
       });
     }
 
     // Si no hay caché, hacer scraping
     console.log('[API] Caché expirado/vacío, realizando scraping...');
-    const jobs = await scrapeWorkanaJobs();
-
-    // Detectar nuevos trabajos para Telegram
-    if (isTelegramConfigured()) {
-      const lastCount = cache.get(LAST_COUNT_KEY) || 0;
-      if (jobs.length > lastCount && lastCount > 0) {
-        const newJobs = jobs.slice(0, jobs.length - lastCount);
-        notifyNewJobs(newJobs).catch(err => console.error('[API] Error en notificación Telegram:', err));
-      }
-      cache.set(LAST_COUNT_KEY, jobs.length, CACHE_DURATION * 10); // Guardar por más tiempo
-    }
+    const jobs = await scrapeFreelancerJobs();
 
     // Guardar en caché
     cache.set(CACHE_KEY, jobs, CACHE_DURATION);
@@ -58,23 +47,25 @@ export async function GET(request) {
       jobs,
       cached: false,
       count: jobs.length,
+      source: 'Freelancer',
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[API] Error en endpoint /api/jobs:', error);
+    console.error('[API] Error en endpoint /api/freelancer:', error);
     
     return NextResponse.json({
       success: false,
       error: error.message,
       jobs: [],
       count: 0,
+      source: 'Freelancer',
       timestamp: new Date().toISOString(),
     }, { status: 500 });
   }
 }
 
 /**
- * POST /api/jobs
+ * POST /api/freelancer
  * Forzar actualización del caché (limpiar caché y hacer nuevo scraping)
  */
 export async function POST(request) {
@@ -86,7 +77,7 @@ export async function POST(request) {
     console.log('[API] Caché limpiado');
 
     // Hacer nuevo scraping
-    const jobs = await scrapeWorkanaJobs();
+    const jobs = await scrapeFreelancerJobs();
 
     // Guardar en caché
     cache.set(CACHE_KEY, jobs, CACHE_DURATION);
@@ -98,16 +89,18 @@ export async function POST(request) {
       cached: false,
       forced: true,
       count: jobs.length,
+      source: 'Freelancer',
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[API] Error en POST /api/jobs:', error);
+    console.error('[API] Error en POST /api/freelancer:', error);
     
     return NextResponse.json({
       success: false,
       error: error.message,
       jobs: [],
       count: 0,
+      source: 'Freelancer',
       timestamp: new Date().toISOString(),
     }, { status: 500 });
   }

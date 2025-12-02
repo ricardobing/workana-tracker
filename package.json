@@ -1,7 +1,7 @@
 {
   "name": "workana-tracker",
-  "version": "1.0.0",
-  "description": "Workana Job Tracker - Scraper de trabajos de Workana con ordenamiento por fecha",
+  "version": "2.0.0",
+  "description": "Job Tracker Pro - Scraper de trabajos de Workana y Freelancer con ordenamiento por fecha",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3008",

@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import JobCard from '@/components/JobCard';
+import JobList from '@/components/JobList';
 import FilterPanel from '@/components/FilterPanel';
 import TabSelector from '@/components/TabSelector';
 
@@ -23,6 +24,7 @@ export default function Home() {
   const [theme, setTheme] = useState('light');
   const [activeTab, setActiveTab] = useState('all'); // Pestaña activa: workana, freelancer, all
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [viewMode, setViewMode] = useState('list'); // 'list' o 'cards'
   
   // Estado de filtros
   const [filters, setFilters] = useState({
@@ -206,6 +208,22 @@ export default function Home() {
             📊 Job Tracker Pro
           </h1>
           <div className="header-actions">
+            <div className="view-toggle">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`view-button ${viewMode === 'list' ? 'active' : ''}`}
+                title="Vista de lista"
+              >
+                📋
+              </button>
+              <button
+                onClick={() => setViewMode('cards')}
+                className={`view-button ${viewMode === 'cards' ? 'active' : ''}`}
+                title="Vista de tarjetas"
+              >
+                🎴
+              </button>
+            </div>
             <button 
               onClick={() => setSoundEnabled(!soundEnabled)}
               className={`sound-toggle ${soundEnabled ? 'active' : ''}`}
@@ -290,11 +308,16 @@ export default function Home() {
         </div>
       )}
 
-      <div className="jobs-grid">
-        {filteredJobs.map(job => (
-          <JobCard key={job.id} job={job} />
-        ))}
-      </div>
+      {/* Vista de lista o tarjetas */}
+      {viewMode === 'list' ? (
+        <JobList jobs={filteredJobs} />
+      ) : (
+        <div className="jobs-grid">
+          {filteredJobs.map(job => (
+            <JobCard key={job.id} job={job} />
+          ))}
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="footer">

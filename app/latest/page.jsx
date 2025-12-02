@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import JobCard from '@/components/JobCard';
+import JobList from '@/components/JobList';
 import FilterPanel from '@/components/FilterPanel';
 
 export default function LatestPage() {
@@ -18,6 +19,7 @@ export default function LatestPage() {
   const [lastUpdate, setLastUpdate] = useState(null);
   const [theme, setTheme] = useState('light');
   const [breakdown, setBreakdown] = useState({ workana: 0, freelancer: 0 });
+  const [viewMode, setViewMode] = useState('list'); // 'list' o 'cards'
 
   // Estado de filtros
   const [filters, setFilters] = useState({
@@ -151,6 +153,22 @@ export default function LatestPage() {
             🔥 Últimas 24 Horas
           </h1>
           <div className="header-actions">
+            <div className="view-toggle">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`view-button ${viewMode === 'list' ? 'active' : ''}`}
+                title="Vista de lista"
+              >
+                📋
+              </button>
+              <button
+                onClick={() => setViewMode('cards')}
+                className={`view-button ${viewMode === 'cards' ? 'active' : ''}`}
+                title="Vista de tarjetas"
+              >
+                🎴
+              </button>
+            </div>
             <Link href="/" className="back-button">
               ← Volver
             </Link>
@@ -232,11 +250,16 @@ export default function LatestPage() {
         </div>
       )}
 
-      <div className="jobs-grid">
-        {filteredJobs.map(job => (
-          <JobCard key={job.id} job={job} />
-        ))}
-      </div>
+      {/* Vista de lista o tarjetas */}
+      {viewMode === 'list' ? (
+        <JobList jobs={filteredJobs} />
+      ) : (
+        <div className="jobs-grid">
+          {filteredJobs.map(job => (
+            <JobCard key={job.id} job={job} />
+          ))}
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="footer">

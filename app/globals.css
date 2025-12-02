@@ -207,6 +207,167 @@ body {
   color: #3B82F6;
 }
 
+.view-toggle {
+  display: flex;
+  gap: 5px;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.view-button {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-button:hover {
+  background-color: var(--bg-card);
+}
+
+.view-button.active {
+  background-color: var(--accent-primary);
+  transform: scale(1.1);
+}
+
+/* ========== Job List View ========== */
+.job-list {
+  background-color: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.job-list-header {
+  display: grid;
+  grid-template-columns: 60px 70px 3fr 1.5fr 1.5fr 2fr;
+  gap: 10px;
+  padding: 15px 20px;
+  background-color: var(--bg-secondary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.job-list-item {
+  display: grid;
+  grid-template-columns: 60px 70px 3fr 1.5fr 1.5fr 2fr;
+  gap: 10px;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+  align-items: center;
+}
+
+.job-list-item:hover {
+  background-color: var(--bg-secondary);
+}
+
+.job-list-item:last-child {
+  border-bottom: none;
+}
+
+.col-source {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.source-badge-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.col-time {
+  text-align: center;
+}
+
+.time-badge {
+  background-color: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.col-title {
+  padding-right: 10px;
+}
+
+.job-list-link {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  display: inline;
+}
+
+.job-list-link:hover {
+  text-decoration: underline;
+}
+
+.type-indicator {
+  margin-left: 8px;
+  font-size: 0.9rem;
+}
+
+.location-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.budget-text {
+  font-weight: 600;
+  color: var(--success);
+  font-size: 0.9rem;
+}
+
+.skills-compact {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.skill-tag-small {
+  background-color: var(--bg-secondary);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.skill-more {
+  background-color: var(--accent-primary);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.no-skills {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
 /* ========== Tab Selector ========== */
 .tab-selector {
   display: flex;
@@ -552,6 +713,48 @@ body {
 
   .job-time {
     margin-top: 5px;
+  }
+
+  /* Lista responsive */
+  .job-list-header {
+    display: none;
+  }
+
+  .job-list-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .col-source {
+    justify-content: flex-start;
+    order: 1;
+  }
+
+  .col-time {
+    text-align: left;
+    order: 2;
+  }
+
+  .col-title {
+    order: 3;
+  }
+
+  .col-location {
+    order: 4;
+  }
+
+  .col-budget {
+    order: 5;
+  }
+
+  .col-skills {
+    order: 6;
+  }
+
+  .source-breakdown {
+    flex-direction: column;
+    gap: 10px;
   }
 }
 

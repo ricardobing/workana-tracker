@@ -1,0 +1,27 @@
+{
+  "name": "workana-tracker",
+  "version": "1.0.0",
+  "description": "Workana Job Tracker - Scraper de trabajos de Workana con ordenamiento por fecha",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3008",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "cheerio": "^1.0.0-rc.12",
+    "axios": "^1.6.0",
+    "node-telegram-bot-api": "^0.64.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
